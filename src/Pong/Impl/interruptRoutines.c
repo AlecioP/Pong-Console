@@ -30,12 +30,13 @@ ISR(INT0_vect){
 }
 
 ISR(TIMER0_COMPA_vect){
-	if(TIMER_COUNT<45*3){//45 = 2D FF 
+	
+	if(TIMER_COUNT<7){
 		TIMER_COUNT++;
 		return;
 	}
 	else
-	TIMER_COUNT = 0;
+		TIMER_COUNT = 0;
 	
 	racket* right_p = &right;
 	ball* b_p = &b;
@@ -44,29 +45,20 @@ ISR(TIMER0_COMPA_vect){
 	
 	autoMove(map,DIFFICULTY,right_p,b);
 	moveball(b_p,right,left,map,LPP_p,RPP_p);
+	gameover(&GAME_OVER,LEFT_PLAYER_POINTS,RIGHT_PLAYER_POINTS,&WINNER);
 	
-	if(ACTUALLY_TRANSMITTED_BYTES == 0 && ENTER_USART_INTERRUPT){
-		UDR0 = TRANSMISSION_START;
-		ENTER_USART_INTERRUPT = 0;
+	
+	
+	if(!GAME_OVER){
+		displayMapLCD();
+		//ENTER_USART_INTERRUPT = 0;
+	}else{
+		if(WINNER==LEFT_PLAYER)
+		 debugPrintLCD("YOU WIN         ");
+		 else
+		 debugPrintLCD("YOU LOSE        ");
 	}
 	
 }
 
-ISR(USART_TX_vect){
-	ENTER_USART_INTERRUPT = 1;
-	if(!START_TRANSMITTED){
-		UDR0 = map[0][0];
-		START_TRANSMITTED = 1;
-		return;
-	}
-	volatile int bytes_per_row = MAP_WIDTH;
-	volatile int total_to_transmit = MAP_HEIGHT * bytes_per_row;
-	ACTUALLY_TRANSMITTED_BYTES++;
-	if(ACTUALLY_TRANSMITTED_BYTES!=total_to_transmit){
-		UDR0 = map[(ACTUALLY_TRANSMITTED_BYTES)/bytes_per_row][(ACTUALLY_TRANSMITTED_BYTES)%bytes_per_row];
-	}else{
-		ACTUALLY_TRANSMITTED_BYTES = 0;
-		START_TRANSMITTED = 0;
-		return;
-	}
-}
+

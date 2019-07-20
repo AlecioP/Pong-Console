@@ -35,9 +35,12 @@ int main(void){
 	map[left.y+1][left.x]=TRUE;
 	map[left.y+2][left.x]=TRUE;
 	
+	initI2CMonitor();
+	//debugPrintLCD("INIT");
 	initTimer();
 	initExternalInterrupts();
-	initUSARTCommunication();
+	//initUSARTCommunication();
+	
 	sei();
 	
 	//CPU in sleep mode

@@ -23,7 +23,7 @@ int GAME_OVER=0;
 int ACTUALLY_TRANSMITTED_BYTES=0;
 int START_TRANSMITTED=0;
 int ENTER_USART_INTERRUPT=1;
-int DIFFICULTY = 15;
+int DIFFICULTY = 15 ;
 //map = { { 0 } };
 /**/
 
@@ -32,3 +32,8 @@ uint8_t TRUE = 0b00000001;
 uint8_t FALSE = 0b00000000;
 
 int TIMER_COUNT = 0;
+
+//LCD MONITOR
+
+//8 is the max storable in CGRAM. 8 are the lines of a single character
+uint8_t custom_char[8][8] = { { 0 } };

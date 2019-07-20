@@ -13,7 +13,7 @@
 #define FRAME_WIDTH 792//ALMOST 800
 #define RACKET_HEIGHT 3
 #define MAP_HEIGHT  16
-#define MAP_WIDTH  32
+#define MAP_WIDTH  20
 /*RACKET MOVE DIRECTIONS*/
 #define GO_UP  -1
 #define GO_DOWN  1
@@ -28,8 +28,8 @@
 
 
 
-// 20 MHz
-//#define F_CPU 20*(1024)*(1024);
+// 16 MHz
+#define F_CPU 16000000UL
 
 
 #endif /* CONSTANTS_H_ */

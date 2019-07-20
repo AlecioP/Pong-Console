@@ -5,10 +5,11 @@
  *  Author: Alessio Portaro
  */ 
 
-//#include "headers.h"
+#include <headers.h>
 #include <avr/io.h>
 #include <avr/interrupt.h>
-
+#define CONVERTED_WIDTH ((MAP_WIDTH-1)/5)+1
+#define CONVERTED_HEIGHT ((/*MH*/(MAP_HEIGHT-1)/*MH*//8)+1)*8
 /*
 	*	To have a delay of 0.1 seconds with XTAL = 1 MHz
 	*
@@ -77,4 +78,53 @@ void initUSARTCommunication(void){
 	//UBRR0H = (unsigned char) (baud_rate>>8);
 	//UBRR0L = (unsigned char) (baud_rate); 
 	UBRR0 = baud_rate;
+}
+
+void initI2CMonitor(void){
+	lcd_init(LCD_DISP_ON);
+	lcd_home();
+	uint8_t led = 0;
+	lcd_led(led);
+	int Pin4_SDA = 4, Pin5_SCL = 5;
+	//Configure portc for output of twi
+	DDRC |= (1<<Pin4_SDA)|(1<<Pin5_SCL);
+}
+
+void displayMapLCD(void){
+	
+	volatile int display_line,display_char,char_line;
+	uint8_t converted[CONVERTED_HEIGHT][CONVERTED_WIDTH];
+	
+	//uint8_t ret_value;
+	uint8_t char_address = 0;
+	//volatile char debug_char = 65; 
+	spiConvert(map,converted);
+	//lcd_clear_CGRAM();
+	lcd_home();
+	
+	for(display_line = 0;display_line<2;display_line++)
+		for(display_char = 0;display_char<4;display_char++){
+			for(char_line = 0;char_line<8;char_line++){
+				custom_char[char_address][char_line]=converted[(display_line*8)+char_line][display_char];
+			}
+			lcd_create_custom_char(char_address,custom_char[char_address]);
+			char_address++;
+		}
+			
+	char_address=0;
+	for(display_line = 0;display_line<2;display_line++){
+		for(display_char = 0;display_char<4;display_char++){
+			lcd_gotoxy(display_char+1,display_line);
+			lcd_putc((display_line*4)+display_char);
+			char_address++;
+		}
+	}
+	
+}
+
+void debugPrintLCD(const char* string){
+	lcd_home();
+	lcd_puts(string);
+	lcd_gotoxy(0,1);
+	lcd_puts("                ");
 }

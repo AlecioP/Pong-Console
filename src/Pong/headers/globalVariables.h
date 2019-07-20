@@ -11,6 +11,7 @@
 #include <constants.h>
 #include <structs.h>
 #include <inttypes.h>
+#include <spiConverter.h>
 
 extern ball b;
 extern racket left;
@@ -32,5 +33,10 @@ extern uint8_t TRUE;
 extern uint8_t FALSE;
 
 extern int TIMER_COUNT;
+
+
+//LCD MONITOR
+
+extern uint8_t custom_char[8][8];
 
 #endif /* GLOBALVARIABLES_H_ */
