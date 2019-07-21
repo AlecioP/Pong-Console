@@ -8,6 +8,7 @@
 #include <headers.h>
 #include <avr/io.h>
 #include <avr/interrupt.h>
+
 #define CONVERTED_WIDTH ((MAP_WIDTH-1)/5)+1
 #define CONVERTED_HEIGHT ((/*MH*/(MAP_HEIGHT-1)/*MH*//8)+1)*8
 /*
@@ -81,7 +82,8 @@ void initUSARTCommunication(void){
 }
 
 void initI2CMonitor(void){
-	lcd_init(LCD_DISP_ON);
+	
+	lcd_init(LCD_DISP_ON_CURSOR_BLINK);
 	lcd_home();
 	uint8_t led = 0;
 	lcd_led(led);
@@ -93,33 +95,98 @@ void initI2CMonitor(void){
 void displayMapLCD(void){
 	
 	volatile int display_line,display_char,char_line;
-	uint8_t converted[CONVERTED_HEIGHT][CONVERTED_WIDTH];
+	/*DEBUG*/
+	//volatile int ret_value;
+	//volatile uint8_t char_sum;
+	char str[5];
+	/*DEBUG*/
 	
-	//uint8_t ret_value;
+	/*Workaround corrupted CGRAM[2]*/
+	const uint8_t SUP_MAP_CHAR_EMPTY  [8] = {
+		0b00011111,
+		0b00000000,
+		0b00000000,
+		0b00000000,
+		0b00000000,
+		0b00000000,
+		0b00000000,
+		0b00000000}; 
+	
+	/**/
+	
 	uint8_t char_address = 0;
-	//volatile char debug_char = 65; 
 	spiConvert(map,converted);
-	//lcd_clear_CGRAM();
-	lcd_home();
+	
+	cgram1_empty = 1;
+	cgram2_empty = 1;
 	
 	for(display_line = 0;display_line<2;display_line++)
 		for(display_char = 0;display_char<4;display_char++){
+			
 			for(char_line = 0;char_line<8;char_line++){
-				custom_char[char_address][char_line]=converted[(display_line*8)+char_line][display_char];
+				custom_char[display_line][display_char].value[char_line]=converted[(display_line*8)+char_line][display_char];
+				if(custom_char[display_line][display_char].value[char_line]!=SUP_MAP_CHAR_EMPTY[char_line] && char_address==1)
+					cgram1_empty = 0;
+				if(custom_char[display_line][display_char].value[char_line]!=SUP_MAP_CHAR_EMPTY[char_line] && char_address==2)
+					cgram2_empty = 0;
 			}
-			lcd_create_custom_char(char_address,custom_char[char_address]);
 			char_address++;
 		}
 			
-	char_address=0;
-	for(display_line = 0;display_line<2;display_line++){
+	char_address = 0;
+			
+	for(display_line = 0;display_line<2;display_line++)
 		for(display_char = 0;display_char<4;display_char++){
-			lcd_gotoxy(display_char+1,display_line);
-			lcd_putc((display_line*4)+display_char);
+			
+			if(cgram1_empty && !cgram2_empty && char_address==1){
+				lcd_gotoxy(display_char+8,display_line);
+				lcd_putc(' ');
+				char_address++;
+				continue;
+			}
+			
+			
+			lcd_create_custom_char(char_address,custom_char[display_line][display_char].value);
+			/**/
+			
+			if(char_address==2){
+				if(cgram1_empty && cgram2_empty){
+					lcd_gotoxy(display_char+8,display_line);
+					lcd_putc(char_address-1);
+					char_address++;
+					continue;
+				}
+				if(cgram1_empty){
+					lcd_create_custom_char(char_address-1,custom_char[display_line][display_char].value);
+					lcd_gotoxy(display_char+8,display_line);
+					lcd_putc(char_address-1);
+					char_address++;
+					continue;
+				}
+				if(cgram2_empty){
+					lcd_gotoxy(display_char+8,display_line);
+					lcd_putc(' ');
+					char_address++;
+					continue;
+				}
+			}
+			lcd_gotoxy(display_char+8,display_line);
+			lcd_putc(char_address);
+			/**/
+			
 			char_address++;
 		}
-	}
-	
+		
+		/*DEBUG*/
+		sprintf(str,"%d",cgram1_empty);
+		lcd_gotoxy(0,0);
+		lcd_puts("        ");
+		//lcd_puts(str);
+		sprintf(str,"%d",cgram2_empty);
+		lcd_gotoxy(0,1);
+		lcd_puts("       ");
+		//lcd_puts(str);
+		/*DEBUG*/
 }
 
 void debugPrintLCD(const char* string){

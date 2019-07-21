@@ -24,6 +24,8 @@ int main(void){
 		}
 	}
 	
+	
+	
 	/*Placing ball in map*/
 	map[b.y][b.x]=TRUE;
 	/*Placing right racket in map*/

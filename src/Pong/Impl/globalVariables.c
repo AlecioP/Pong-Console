@@ -36,4 +36,8 @@ int TIMER_COUNT = 0;
 //LCD MONITOR
 
 //8 is the max storable in CGRAM. 8 are the lines of a single character
-uint8_t custom_char[8][8] = { { 0 } };
+lcd_char custom_char[2][4] = { { 0 } };
+	
+uint8_t converted[16][4] = { { 0 } };
+	
+int cgram1_empty = 1,cgram2_empty = 1;

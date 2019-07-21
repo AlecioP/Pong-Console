@@ -22,6 +22,9 @@ typedef struct racket_str
 	int y;
 } racket;
 
+typedef struct LCD_CHARACTER {
+	uint8_t value[8];
+} lcd_char;
 
 
 #endif /* STRUCTS_H_ */

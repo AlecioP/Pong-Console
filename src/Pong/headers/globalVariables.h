@@ -37,6 +37,10 @@ extern int TIMER_COUNT;
 
 //LCD MONITOR
 
-extern uint8_t custom_char[8][8];
+extern lcd_char custom_char[2][4];
+
+extern uint8_t converted[16][4];
+
+extern int cgram1_empty,cgram2_empty;
 
 #endif /* GLOBALVARIABLES_H_ */

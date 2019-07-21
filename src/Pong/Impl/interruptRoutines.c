@@ -31,7 +31,7 @@ ISR(INT0_vect){
 
 ISR(TIMER0_COMPA_vect){
 	
-	if(TIMER_COUNT<7){
+	if(TIMER_COUNT<5){
 		TIMER_COUNT++;
 		return;
 	}
@@ -54,9 +54,9 @@ ISR(TIMER0_COMPA_vect){
 		//ENTER_USART_INTERRUPT = 0;
 	}else{
 		if(WINNER==LEFT_PLAYER)
-		 debugPrintLCD("YOU WIN         ");
-		 else
-		 debugPrintLCD("YOU LOSE        ");
+			debugPrintLCD("YOU WIN         ");
+		else
+			debugPrintLCD("YOU LOSE        ");
 	}
 	
 }
